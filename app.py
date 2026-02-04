@@ -7,14 +7,12 @@ Original file is located at
     https://colab.research.google.com/drive/1EWyKKbgxKA9l-h2hR_6mqCUJd3uxik_7
 """
 
-
-
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
 
 st.title("Student Grade Analysis Using Python")
-st.write("Capstone Project – Data Analytics")
+st.subheader("Capstone Project - Data Analytics")
 
 num_students = st.number_input(
     "Enter number of students",
@@ -22,83 +20,71 @@ num_students = st.number_input(
     step=1
 )
 
-student_names = {}
-student_percentages = {}
-student_grades = {}
+students = []
 
-subject_totals = {"Mathematics": 0, "Physics": 0, "Computer Science": 0}
-subject_counts = {"Mathematics": 0, "Physics": 0, "Computer Science": 0}
+if st.button("Generate Input Fields"):
+    for i in range(int(num_students)):
+        st.markdown(f"### Student {i+1}")
 
-if st.button("Generate Result"):
+        roll = st.text_input(f"Roll Number {i+1}", key=f"roll{i}")
+        name = st.text_input(f"Student Name {i+1}", key=f"name{i}")
 
-    for i in range(num_students):
-        st.subheader(f"Student {i+1}")
+        marks = st.number_input(
+            f"Marks of Student {i+1}",
+            min_value=0,
+            max_value=100,
+            key=f"marks{i}"
+        )
 
-        roll = st.text_input(f"Roll Number {i+1}")
-        name = st.text_input(f"Student Name {i+1}")
-        student_names[roll] = name
+        students.append({
+            "Roll No": roll,
+            "Name": name,
+            "Marks": marks
+        })
 
-        total = 0
-        subjects = ["Mathematics", "Physics", "Computer Science"]
+    if st.button("Generate Result"):
+        df = pd.DataFrame(students)
 
-        for sub in subjects:
-            marks = st.number_input(
-                f"{sub} Marks ({name})",
-                min_value=0,
-                max_value=100,
-                key=f"{sub}{i}"
-            )
-            total += marks
-            subject_totals[sub] += marks
-            subject_counts[sub] += 1
+        df["Percentage"] = df["Marks"]
+        df["CGPA"] = df["Percentage"] / 10
 
-        percentage = total / len(subjects)
+        def grade(p):
+            if p >= 90:
+                return "A+"
+            elif p >= 80:
+                return "A"
+            elif p >= 70:
+                return "B"
+            elif p >= 60:
+                return "C"
+            else:
+                return "Fail"
 
-        if percentage >= 90:
-            grade = "A+"
-        elif percentage >= 80:
-            grade = "A"
-        elif percentage >= 70:
-            grade = "B"
-        elif percentage >= 60:
-            grade = "C"
-        else:
-            grade = "F"
+        df["Grade"] = df["Percentage"].apply(grade)
 
-        student_percentages[roll] = percentage
-        student_grades[roll] = grade
+        st.subheader("Student Result Table")
+        st.dataframe(df)
 
-        st.success(f"Percentage: {percentage:.2f}%")
-        st.info(f"Grade: {grade}")
+        # Topper & Lowest
+        topper = df.loc[df["Percentage"].idxmax()]
+        lowest = df.loc[df["Percentage"].idxmin()]
 
-    # 📊 Student-wise Percentage Graph
-    st.subheader("Student-wise Percentage Analysis")
-    plt.bar(student_names.values(), student_percentages.values())
-    plt.xlabel("Students")
-    plt.ylabel("Percentage")
-    st.pyplot(plt)
+        st.success(f"🏆 Topper: {topper['Name']} ({topper['Percentage']}%)")
+        st.error(f"⬇ Lowest: {lowest['Name']} ({lowest['Percentage']}%)")
 
-    # 📊 Subject-wise Average Graph
-    st.subheader("Subject-wise Average Marks")
-    subject_avg = {
-        sub: subject_totals[sub] / subject_counts[sub]
-        for sub in subject_totals
-    }
-    plt.bar(subject_avg.keys(), subject_avg.values())
-    plt.xlabel("Subjects")
-    plt.ylabel("Average Marks")
-    st.pyplot(plt)
+        # Bar Chart
+        st.subheader("Marks Comparison")
+        fig, ax = plt.subplots()
+        ax.bar(df["Name"], df["Percentage"])
+        ax.set_ylabel("Percentage")
+        ax.set_xlabel("Students")
+        st.pyplot(fig)
 
-    # 🥧 Grade Distribution Pie Chart
-    st.subheader("Grade Distribution")
-    grade_count = {}
-    for g in student_grades.values():
-        grade_count[g] = grade_count.get(g, 0) + 1
+        # Pie Chart
+        st.subheader("Grade Distribution")
+        grade_count = df["Grade"].value_counts()
+        fig2, ax2 = plt.subplots()
+        ax2.pie(grade_count, labels=grade_count.index, autopct="%1.1f%%")
+        st.pyplot(fig2)
 
-    plt.pie(
-        grade_count.values(),
-        labels=grade_count.keys(),
-        autopct="%1.1f%%",
-        startangle=90
-    )
-    st.pyplot(plt)
+
