@@ -11,73 +11,97 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-st.title("Student Grade Analysis Using Python")
-st.subheader("Capstone Project – Data Analytics")
+st.set_page_config(page_title="Student Performance Analysis", layout="wide")
 
-# Initialize session state
-if "generated" not in st.session_state:
-    st.session_state.generated = False
+st.title("📊 Student Performance Analysis System")
 
-if "students" not in st.session_state:
-    st.session_state.students = []
+# -------------------------
+# INPUT SECTION
+# -------------------------
+num_students = st.number_input("Enter number of students", min_value=1, step=1)
 
-num_students = st.number_input(
-    "Enter number of students",
-    min_value=1,
-    step=1
-)
+subjects = ["Math", "Physics", "Chemistry", "English", "Computer"]
 
-if st.button("Generate Input Fields"):
-    st.session_state.students = []
-    for i in range(num_students):
-        st.session_state.students.append({
-            "roll": "",
-            "name": "",
-            "marks": 0
-        })
-    st.session_state.generated = True
+students_data = []
 
-# Show inputs only AFTER button click
-if st.session_state.generated:
-    st.markdown("### Enter Student Details")
+for i in range(num_students):
+    st.subheader(f"Student {i+1}")
 
-    for i in range(num_students):
-        st.markdown(f"#### Student {i+1}")
-        st.session_state.students[i]["roll"] = st.text_input(
-            f"Roll Number {i+1}",
-            key=f"roll_{i}"
-        )
-        st.session_state.students[i]["name"] = st.text_input(
-            f"Student Name {i+1}",
-            key=f"name_{i}"
-        )
-        st.session_state.students[i]["marks"] = st.number_input(
-            f"Marks {i+1}",
-            min_value=0,
-            max_value=100,
-            key=f"marks_{i}"
-        )
+    roll = st.text_input(f"Roll No {i+1}")
+    name = st.text_input(f"Name {i+1}")
 
-    if st.button("Generate Result"):
-        df = pd.DataFrame(st.session_state.students)
+    marks = {}
+    total_marks = 0
 
-        df["Percentage"] = df["marks"]
-        df["Grade"] = df["Percentage"].apply(
-            lambda x: "A" if x >= 75 else "B" if x >= 60 else "C" if x >= 40 else "F"
-        )
+    for sub in subjects:
+        m = st.number_input(f"{sub} Marks ({name})", min_value=0, max_value=100, key=f"{sub}{i}")
+        marks[sub] = m
+        total_marks += m
 
-        st.markdown("## Result Table")
-        st.dataframe(df)
+    percentage = total_marks / len(subjects)
+    cgpa = round(percentage / 9.5, 2)
 
-        st.markdown("## Marks Bar Graph")
-        fig, ax = plt.subplots()
-        ax.bar(df["name"], df["marks"])
-        ax.set_ylabel("Marks")
-        ax.set_xlabel("Student Name")
-        st.pyplot(fig)
+    students_data.append({
+        "Roll No": roll,
+        "Name": name,
+        "Total Marks": total_marks,
+        "Percentage": round(percentage, 2),
+        "CGPA": cgpa,
+        **marks
+    })
 
-        st.markdown("## Grade Distribution (Pie Chart)")
-        grade_count = df["Grade"].value_counts()
-        fig2, ax2 = plt.subplots()
-        ax2.pie(grade_count, labels=grade_count.index, autopct="%1.1f%%")
-        st.pyplot(fig2)
+# -------------------------
+# PROCESS & OUTPUT
+# -------------------------
+if st.button("Generate Result"):
+
+    df = pd.DataFrame(students_data)
+
+    st.subheader("📋 Result Table")
+    st.dataframe(df)
+
+    # -------------------------
+    # TOP & LOW PERFORMER
+    # -------------------------
+    top_student = df.loc[df["Percentage"].idxmax()]
+    low_student = df.loc[df["Percentage"].idxmin()]
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.success(f"🏆 Top Performer: {top_student['Name']} ({top_student['Percentage']}%)")
+
+    with col2:
+        st.error(f"⚠ Lower Performer: {low_student['Name']} ({low_student['Percentage']}%)")
+
+    # -------------------------
+    # BAR GRAPH (OVERALL)
+    # -------------------------
+    st.subheader("📊 Overall Percentage Bar Graph")
+
+    fig, ax = plt.subplots()
+    ax.bar(df["Name"], df["Percentage"])
+    ax.set_ylabel("Percentage")
+    ax.set_xlabel("Students")
+    st.pyplot(fig)
+
+    # -------------------------
+    # SUBJECT DIFFICULTY
+    # -------------------------
+    subject_avg = df[subjects].mean()
+    difficult_subject = subject_avg.idxmin()
+
+    st.subheader("📉 Subject Analysis")
+    st.write("### Subject Average Marks")
+    st.write(subject_avg)
+
+    st.warning(f"📌 Most Difficult Subject: **{difficult_subject}**")
+
+    # -------------------------
+    # SUBJECT AVERAGE GRAPH
+    # -------------------------
+    fig2, ax2 = plt.subplots()
+    ax2.bar(subject_avg.index, subject_avg.values)
+    ax2.set_ylabel("Average Marks")
+    ax2.set_xlabel("Subjects")
+    st.pyplot(fig2)
