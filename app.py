@@ -8,11 +8,18 @@ Original file is located at
 """
 
 import streamlit as st
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
 
 st.title("Student Grade Analysis Using Python")
-st.subheader("Capstone Project - Data Analytics")
+st.subheader("Capstone Project – Data Analytics")
+
+# Initialize session state
+if "generated" not in st.session_state:
+    st.session_state.generated = False
+
+if "students" not in st.session_state:
+    st.session_state.students = []
 
 num_students = st.number_input(
     "Enter number of students",
@@ -20,71 +27,57 @@ num_students = st.number_input(
     step=1
 )
 
-students = []
-
 if st.button("Generate Input Fields"):
-    for i in range(int(num_students)):
-        st.markdown(f"### Student {i+1}")
+    st.session_state.students = []
+    for i in range(num_students):
+        st.session_state.students.append({
+            "roll": "",
+            "name": "",
+            "marks": 0
+        })
+    st.session_state.generated = True
 
-        roll = st.text_input(f"Roll Number {i+1}", key=f"roll{i}")
-        name = st.text_input(f"Student Name {i+1}", key=f"name{i}")
+# Show inputs only AFTER button click
+if st.session_state.generated:
+    st.markdown("### Enter Student Details")
 
-        marks = st.number_input(
-            f"Marks of Student {i+1}",
+    for i in range(num_students):
+        st.markdown(f"#### Student {i+1}")
+        st.session_state.students[i]["roll"] = st.text_input(
+            f"Roll Number {i+1}",
+            key=f"roll_{i}"
+        )
+        st.session_state.students[i]["name"] = st.text_input(
+            f"Student Name {i+1}",
+            key=f"name_{i}"
+        )
+        st.session_state.students[i]["marks"] = st.number_input(
+            f"Marks {i+1}",
             min_value=0,
             max_value=100,
-            key=f"marks{i}"
+            key=f"marks_{i}"
         )
 
-        students.append({
-            "Roll No": roll,
-            "Name": name,
-            "Marks": marks
-        })
-
     if st.button("Generate Result"):
-        df = pd.DataFrame(students)
+        df = pd.DataFrame(st.session_state.students)
 
-        df["Percentage"] = df["Marks"]
-        df["CGPA"] = df["Percentage"] / 10
+        df["Percentage"] = df["marks"]
+        df["Grade"] = df["Percentage"].apply(
+            lambda x: "A" if x >= 75 else "B" if x >= 60 else "C" if x >= 40 else "F"
+        )
 
-        def grade(p):
-            if p >= 90:
-                return "A+"
-            elif p >= 80:
-                return "A"
-            elif p >= 70:
-                return "B"
-            elif p >= 60:
-                return "C"
-            else:
-                return "Fail"
-
-        df["Grade"] = df["Percentage"].apply(grade)
-
-        st.subheader("Student Result Table")
+        st.markdown("## Result Table")
         st.dataframe(df)
 
-        # Topper & Lowest
-        topper = df.loc[df["Percentage"].idxmax()]
-        lowest = df.loc[df["Percentage"].idxmin()]
-
-        st.success(f"🏆 Topper: {topper['Name']} ({topper['Percentage']}%)")
-        st.error(f"⬇ Lowest: {lowest['Name']} ({lowest['Percentage']}%)")
-
-        # Bar Chart
-        st.subheader("Marks Comparison")
+        st.markdown("## Marks Bar Graph")
         fig, ax = plt.subplots()
-        ax.bar(df["Name"], df["Percentage"])
-        ax.set_ylabel("Percentage")
-        ax.set_xlabel("Students")
+        ax.bar(df["name"], df["marks"])
+        ax.set_ylabel("Marks")
+        ax.set_xlabel("Student Name")
         st.pyplot(fig)
 
-        # Pie Chart
-        st.subheader("Grade Distribution")
+        st.markdown("## Grade Distribution (Pie Chart)")
         grade_count = df["Grade"].value_counts()
         fig2, ax2 = plt.subplots()
         ax2.pie(grade_count, labels=grade_count.index, autopct="%1.1f%%")
         st.pyplot(fig2)
-
-
