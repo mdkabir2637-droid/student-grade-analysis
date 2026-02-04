@@ -7,10 +7,11 @@ Original file is located at
     https://colab.research.google.com/drive/1EWyKKbgxKA9l-h2hR_6mqCUJd3uxik_7
 """
 
-!pip install streamlit
+
 
 import streamlit as st
 import matplotlib.pyplot as plt
+import pandas as pd
 
 st.title("Student Grade Analysis Using Python")
 st.write("Capstone Project – Data Analytics")
