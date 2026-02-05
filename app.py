@@ -171,7 +171,7 @@ st.pyplot(fig3)
     # --------------------------------
     # Subject Difficulty
     # --------------------------------
-    st.subheader("📘 Subject Difficulty Analysis")
+st.subheader("📘 Subject Difficulty Analysis")
 
     subject_avg = {
         "Mathematics I": df["Maths"].mean(),
