@@ -10,17 +10,13 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# --------------------------------
-# Page Config
-# --------------------------------
+# -------------------- PAGE SETUP --------------------
 st.set_page_config(page_title="Student Grade Analysis", layout="wide")
 
-st.title("🎓 Student Grade Analysis using Python")
-st.subheader("Capstone Project – Data Analytics")
+st.title("🎓 Capstone Project – Student Grade Analysis Using Python")
+st.subheader("Data Analytics | Percentage | CGPA | Grade | Graphs")
 
-# --------------------------------
-# Fixed Subjects
-# --------------------------------
+# -------------------- SUBJECTS --------------------
 subjects = [
     "Mathematics I",
     "Computer Science",
@@ -28,165 +24,123 @@ subjects = [
     "English for Professionals"
 ]
 
-# --------------------------------
-# Number of Students
-# --------------------------------
+# -------------------- INPUT: NUMBER OF STUDENTS --------------------
 num_students = st.number_input(
     "Enter Number of Students",
     min_value=1,
     step=1
 )
 
-students = []
+students_data = []
 
-# --------------------------------
-# Input Section
-# --------------------------------
-for i in range(num_students):
-    st.markdown(f"## Student {i+1}")
+# -------------------- INPUT FORM --------------------
+if num_students > 0:
+    st.subheader("📝 Enter Student Details")
 
-    roll = st.text_input(f"Roll Number", key=f"roll{i}")
-    name = st.text_input(f"Student Name", key=f"name{i}")
+    for i in range(num_students):
+        st.markdown(f"### Student {i+1}")
 
-    marks = {}
-    for sub in subjects:
-        marks[sub] = st.number_input(
-            f"Marks in {sub}",
-            min_value=0,
-            max_value=100,
-            step=1,
-            key=f"{sub}{i}"
+        roll = st.text_input(f"Roll Number", key=f"roll_{i}")
+        name = st.text_input(f"Student Name", key=f"name_{i}")
+
+        marks = {}
+        total_marks = 0
+
+        for sub in subjects:
+            m = st.number_input(
+                f"{sub} Marks",
+                min_value=0,
+                max_value=100,
+                step=1,
+                key=f"{sub}_{i}"
+            )
+            marks[sub] = m
+            total_marks += m
+
+        if roll and name:
+            percentage = total_marks / len(subjects)
+
+            # Grade Logic
+            if percentage >= 85:
+                grade = "A"
+                cgpa = 9.0
+            elif percentage >= 70:
+                grade = "B"
+                cgpa = 8.0
+            elif percentage >= 55:
+                grade = "C"
+                cgpa = 7.0
+            else:
+                grade = "D"
+                cgpa = 6.0
+
+            students_data.append({
+                "Roll No": roll,
+                "Name": name,
+                "Percentage": round(percentage, 2),
+                "CGPA": cgpa,
+                "Grade": grade,
+                **marks
+            })
+
+# -------------------- GENERATE RESULT --------------------
+if st.button("📊 Generate Result"):
+
+    if len(students_data) == 0:
+        st.warning("Please enter student details first.")
+    else:
+        df = pd.DataFrame(students_data)
+
+        st.subheader("📋 Result Table")
+        st.dataframe(df)
+
+        # ---------------- TOPPER & LOWEST ----------------
+        topper = df.loc[df["Percentage"].idxmax()]
+        lowest = df.loc[df["Percentage"].idxmin()]
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.success(f"🏆 Topper: {topper['Name']} ({topper['Percentage']}%)")
+        with col2:
+            st.error(f"⬇ Lowest Performer: {lowest['Name']} ({lowest['Percentage']}%)")
+
+        # ---------------- BAR GRAPH: STUDENT PERFORMANCE ----------------
+        st.subheader("📊 Student Performance (Percentage)")
+        fig1, ax1 = plt.subplots()
+        ax1.bar(df["Name"], df["Percentage"])
+        ax1.set_ylabel("Percentage")
+        ax1.set_xlabel("Students")
+        st.pyplot(fig1)
+
+        # ---------------- PIE CHART: GRADE DISTRIBUTION ----------------
+        st.subheader("🥧 Grade Distribution")
+        grade_counts = df["Grade"].value_counts()
+
+        fig2, ax2 = plt.subplots()
+        ax2.pie(
+            grade_counts,
+            labels=grade_counts.index,
+            autopct="%1.1f%%",
+            startangle=90
         )
+        ax2.axis("equal")
+        st.pyplot(fig2)
 
-    if roll and name:
-        total = sum(marks.values())
-        percentage = total / len(subjects)
-        cgpa = round(percentage / 10, 2)
+        # ---------------- SUBJECT AVERAGE BAR GRAPH ----------------
+        st.subheader("📘 Subject-wise Average Marks")
 
-        if percentage >= 80:
-            grade = "A"
-        elif percentage >= 60:
-            grade = "B"
-        elif percentage >= 40:
-            grade = "C"
-        else:
-            grade = "D"
+        subject_avg = df[subjects].mean()
 
-        students.append([
-            roll, name,
-            marks["Mathematics I"],
-            marks["Computer Science"],
-            marks["Data Analytics"],
-            marks["English for Professionals"],
-            total, round(percentage, 2), cgpa, grade
-        ])
+        fig3, ax3 = plt.subplots()
+        ax3.bar(subject_avg.index, subject_avg.values)
+        ax3.set_ylabel("Average Marks")
+        ax3.set_xlabel("Subjects")
+        st.pyplot(fig3)
 
-# --------------------------------
-# Generate Result
-# --------------------------------
-if st.button("Generate Result") and students:
+        # ---------------- SUBJECT DIFFICULTY ----------------
+        st.subheader("📉 Subject Difficulty Analysis")
+        hardest = subject_avg.idxmin()
+        easiest = subject_avg.idxmax()
 
-    columns = [
-        "Roll No", "Name",
-        "Maths", "CS", "DA", "English",
-        "Total Marks", "Percentage", "CGPA", "Grade"
-    ]
-
-    df = pd.DataFrame(students, columns=columns)
-
-    # --------------------------------
-    # Result Table
-    # --------------------------------
-    st.subheader("📋 Result Table")
-    st.dataframe(df)
-
-    # --------------------------------
-    # Top & Low Performer
-    # --------------------------------
-    top = df.loc[df["Total Marks"].idxmax()]
-    low = df.loc[df["Total Marks"].idxmin()]
-
-    col1, col2 = st.columns(2)
-    col1.success(f"🏆 Top Performer: {top['Name']} ({top['Total Marks']} Marks)")
-    col2.error(f"⬇ Low Performer: {low['Name']} ({low['Total Marks']} Marks)")
-
-    # --------------------------------
-    # Bar Graph
-    # --------------------------------
-    st.subheader("📊 Total Marks Bar Graph")
-    fig, ax = plt.subplots()
-    ax.bar(df["Name"], df["Total Marks"])
-    ax.set_xlabel("Students")
-    ax.set_ylabel("Total Marks")
-    st.pyplot(fig)
-
-    # --------------------------------
-    # Grade Distribution Pie Chart
-    # --------------------------------
-    st.subheader("🥧 Grade Distribution")
-    grade_counts = df["Grade"].value_counts()
-
-    fig2, ax2 = plt.subplots()
-    ax2.pie(
-        grade_counts,
-        labels=grade_counts.index,
-        autopct="%1.1f%%",
-        startangle=90
-    )
-    ax2.axis("equal")
-    st.pyplot(fig2)
-    # --------------------------------
-
-    # --------------------------------
-# Subject-wise Average Marks Bar Graph
-# --------------------------------
-st.subheader("📊 Subject-wise Average Marks")
-
-subject_avg_df = pd.DataFrame({
-    "Subject": [
-        "Mathematics I",
-        "Computer Science",
-        "Data Analytics",
-        "English for Professionals"
-    ],
-    "Average Marks": [
-        df["Maths"].mean(),
-        df["CS"].mean(),
-        df["DA"].mean(),
-        df["English"].mean()
-    ]
-})
-
-fig3, ax3 = plt.subplots()
-ax3.bar(subject_avg_df["Subject"], subject_avg_df["Average Marks"])
-ax3.set_xlabel("Subjects")
-ax3.set_ylabel("Average Marks")
-ax3.set_ylim(0, 100)
-
-st.pyplot(fig3)
-
-
-    
-
-    # --------------------------------
-    # Subject Difficulty
-    # --------------------------------
-st.subheader("📘 Subject Difficulty Analysis")
-
-    subject_avg = {
-        "Mathematics I": df["Maths"].mean(),
-        "Computer Science": df["CS"].mean(),
-        "Data Analytics": df["DA"].mean(),
-        "English": df["English"].mean()
-    }
-
-    for sub, avg in subject_avg.items():
-        if avg >= 70:
-            st.success(f"{sub}: Easy")
-        elif avg >= 50:
-            st.warning(f"{sub}: Moderate")
-        else:
-            st.error(f"{sub}: Difficult")
-
-else:
-    st.info("Enter student details and click Generate Result")
+        st.info(f"Hardest Subject: {hardest}")
+        st.success(f"Easiest Subject: {easiest}")
