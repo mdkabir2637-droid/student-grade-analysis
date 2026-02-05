@@ -105,3 +105,20 @@ if st.button("Generate Result"):
     ax2.set_ylabel("Average Marks")
     ax2.set_xlabel("Subjects")
     st.pyplot(fig2)
+    st.subheader("📊 Grade Distribution (Pie Chart)")
+
+# Grade count
+grade_counts = df["Grade"].value_counts()
+
+# Pie chart
+fig, ax = plt.subplots()
+ax.pie(
+    grade_counts,
+    labels=grade_counts.index,
+    autopct='%1.1f%%',
+    startangle=90
+)
+ax.axis('equal')  # circle banane ke liye
+
+st.pyplot(fig)
+
