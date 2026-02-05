@@ -135,6 +135,38 @@ if st.button("Generate Result") and students:
     )
     ax2.axis("equal")
     st.pyplot(fig2)
+    # --------------------------------
+
+    # --------------------------------
+# Subject-wise Average Marks Bar Graph
+# --------------------------------
+st.subheader("📊 Subject-wise Average Marks")
+
+subject_avg_df = pd.DataFrame({
+    "Subject": [
+        "Mathematics I",
+        "Computer Science",
+        "Data Analytics",
+        "English for Professionals"
+    ],
+    "Average Marks": [
+        df["Maths"].mean(),
+        df["CS"].mean(),
+        df["DA"].mean(),
+        df["English"].mean()
+    ]
+})
+
+fig3, ax3 = plt.subplots()
+ax3.bar(subject_avg_df["Subject"], subject_avg_df["Average Marks"])
+ax3.set_xlabel("Subjects")
+ax3.set_ylabel("Average Marks")
+ax3.set_ylim(0, 100)
+
+st.pyplot(fig3)
+
+
+    
 
     # --------------------------------
     # Subject Difficulty
