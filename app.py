@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 # -------------------- PAGE SETUP --------------------
 st.set_page_config(page_title="Student Grade Analysis", layout="wide")
 
-st.title("🎓 Capstone Project – Student Grade Analysis Using Python")
+st.title("🎓 Capstone Project – Comparative Students Performance Analysis: A Multi-Metric Review")
 st.subheader("Data Analytics | Percentage | CGPA | Grade | Graphs")
 
 # -------------------- SUBJECTS --------------------
