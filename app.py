@@ -18,10 +18,11 @@ st.subheader("Data Analytics | Percentage | CGPA | Grade | Graphs")
 
 # -------------------- SUBJECTS --------------------
 subjects = [
-    "Mathematics I",
-    "Computer Science",
-    "Data Analytics",
-    "English for Professionals"
+    "Mathematics",
+    "Physics",
+    "Chemistry",
+    "English"
+    "Hindi"
 ]
 
 # -------------------- INPUT: NUMBER OF STUDENTS --------------------
