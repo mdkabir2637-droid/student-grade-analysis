@@ -107,7 +107,7 @@ if st.button("📊 Generate Result"):
 
         # ---------------- BAR GRAPH: STUDENT PERFORMANCE ----------------
         st.subheader("📊 Student Performance (Percentage)")
-        fig1, ax1 = plt.subplots(figsize=(14, 7))
+        fig1, ax1 = plt.subplots(figsize=(20, 10))
         ax1.bar(df["Name"], df["Percentage"])
         ax1.set_ylabel("Percentage")
         ax1.set_xlabel("Students")
