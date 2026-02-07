@@ -21,7 +21,7 @@ subjects = [
     "Mathematics",
     "Physics",
     "Chemistry",
-    "English"
+    "English",
     "Hindi"
 ]
 
