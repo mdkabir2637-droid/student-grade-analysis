@@ -60,20 +60,23 @@ if num_students > 0:
 
         if roll and name:
             percentage = total_marks / len(subjects)
+            cgpa = round(percentage / 9.5, 2)
 
             # Grade Logic
-            if percentage >= 85:
-                grade = "A"
-                cgpa = 9.0
+            if percentage >= 90:
+                grade = "AA"
+            elif percentage >= 80:
+                grade = "AB"
             elif percentage >= 70:
-                grade = "B"
-                cgpa = 8.0
-            elif percentage >= 55:
-                grade = "C"
-                cgpa = 7.0
+                grade = "BB"
+            elif percentage >= 60:
+                grade = "BC"
+            elif percentage >= 50:
+                grade = "CC"
+            elif percentage >= 40:
+                grade = "DD"
             else:
-                grade = "D"
-                cgpa = 6.0
+                grade = "F"
 
             students_data.append({
                 "Roll No": roll,
