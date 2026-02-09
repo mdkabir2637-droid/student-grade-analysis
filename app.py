@@ -111,31 +111,31 @@ if st.button("📊 Generate Result"):
         # ---------------- BAR GRAPH: STUDENT PERFORMANCE ----------------
         st.subheader("📊 Student Performance (Percentage)")
 
-fig1, ax1 = plt.subplots(figsize=(28, 14))
+        fig1, ax1 = plt.subplots(figsize=(28, 14))
 
-# Find topper percentage
-top_percentage = df["Percentage"].max()
+        # Find topper percentage
+        top_percentage = df["Percentage"].max()
 
-# Assign colors
-bar_colors = []
-for _, row in df.iterrows():
-    if row["Percentage"] == top_percentage:
-        bar_colors.append("green")   # Topper
-    elif row["Grade"] == "F":
-        bar_colors.append("red")     # Fail
-    else:
-        bar_colors.append("steelblue")  # Others
+        # Assign colors
+        bar_colors = []
+        for _, row in df.iterrows():
+            if row["Percentage"] == top_percentage:
+               bar_colors.append("green")   # Topper
+            elif row["Grade"] == "F":
+                 bar_colors.append("red")     # Fail
+            else:
+                 bar_colors.append("steelblue")  # Others
 
-ax1.bar(df["Name"], df["Percentage"], color=bar_colors)
+        ax1.bar(df["Name"], df["Percentage"], color=bar_colors)
 
-ax1.set_ylabel("Percentage")
-ax1.set_xlabel("Students")
-ax1.set_title("Student vs Percentage Analysis")
+        ax1.set_ylabel("Percentage")
+        ax1.set_xlabel("Students")
+        ax1.set_title("Student vs Percentage Analysis")
 
-ax1.set_xticklabels(df["Name"], rotation=45, ha="right")
+        ax1.set_xticklabels(df["Name"], rotation=45, ha="right")
 
-plt.tight_layout()
-st.pyplot(fig1)
+        plt.tight_layout()
+        st.pyplot(fig1)
 
         # ---------------- PIE CHART: GRADE DISTRIBUTION ----------------
         st.subheader("🥧 Grade Distribution")
@@ -154,20 +154,20 @@ st.pyplot(fig1)
         # ---------------- SUBJECT AVERAGE BAR GRAPH ----------------
         st.subheader("📘 Subject-wise Average Marks")
 
-subject_avg = df[subjects].mean()
+        subject_avg = df[subjects].mean()
 
-colors = ["orange", "seagreen", "purple", "teal", "brown"]
+        colors = ["orange", "seagreen", "purple", "teal", "brown"]
 
-fig3, ax3 = plt.subplots()
+        fig3, ax3 = plt.subplots()
 
-ax3.bar(subject_avg.index, subject_avg.values, color=colors)
+        ax3.bar(subject_avg.index, subject_avg.values, color=colors)
 
-ax3.set_ylabel("Average Marks")
-ax3.set_xlabel("Subjects")
-ax3.set_title("Average Marks per Subject")
+        ax3.set_ylabel("Average Marks")
+        ax3.set_xlabel("Subjects")
+        ax3.set_title("Average Marks per Subject")
 
-plt.tight_layout()
-st.pyplot(fig3)
+        plt.tight_layout()
+        st.pyplot(fig3)
 
 
         # ---------------- SUBJECT DIFFICULTY ----------------
