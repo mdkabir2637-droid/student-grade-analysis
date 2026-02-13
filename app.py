@@ -160,8 +160,6 @@ if st.button("📊 Generate Result"):
         ax1.set_xlabel("Students")
         ax1.set_title("Student vs Percentage Analysis")
 
-        ax1.set_xticklabels(df["Name"], rotation=45, ha="right")
-
         plt.tight_layout()
         st.pyplot(fig1, use_container_width=True)
 
