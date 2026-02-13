@@ -15,6 +15,18 @@ import matplotlib.pyplot as plt
 st.set_page_config(page_title="Student Grade Analysis", layout="wide")
 
 st.title("🎓 Capstone Project – Comparative Students Performance Analysis: A Multi-Metric Review")
+st.markdown("""
+---
+### 🏫 Institution Details  
+**College:** IIT PATNA  
+**Group No:** 46  
+**Group Members:**  
+- MD Kabir  
+- Naman Kabra  
+- Vedant Kailash  
+---
+""")
+
 st.subheader("Data Analytics | Percentage | CGPA | Grade | Graphs")
 
 # -------------------- SUBJECTS --------------------
