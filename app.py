@@ -18,7 +18,8 @@ st.title("🎓 Capstone Project – Comparative Students Performance Analysis: A
 st.markdown("""
 ---
 ### 🏫 Institution Details  
-**College:** IIT PATNA  
+**College:** IIT PATNA
+**Course:** Computer Science & Data Analytics
 **Group No:** 46  
 **Group Members:**  
 - MD Kabir  
