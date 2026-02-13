@@ -139,7 +139,7 @@ if st.button("📊 Generate Result"):
         # ---------------- BAR GRAPH: STUDENT PERFORMANCE ----------------
         st.subheader("📊 Student Performance (Percentage)")
 
-        fig1, ax1 = plt.subplots(figsize=(10, 5))
+        fig1, ax1 = plt.subplots(figsize=(10, 6))
 
         # Find topper percentage
         top_percentage = df["Percentage"].max()
