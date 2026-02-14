@@ -24,7 +24,7 @@ st.markdown("""
 **Group Members:**  
 - MD Kabir  
 - Naman Kabra  
-- Vedant Kailash  
+- Vedant Kailas Singare  
 
 **College:** IIT PATNA  
 **Course:** Computer Science & Data Analytics
@@ -90,7 +90,7 @@ if num_students > 0:
                 grade = "BC"
             elif percentage >= 50:
                 grade = "CC"
-            elif percentage >= 40:
+            elif percentage >= 33:
                 grade = "DD"
             else:
                 grade = "F"
