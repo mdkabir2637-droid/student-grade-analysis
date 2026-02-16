@@ -24,7 +24,8 @@ st.markdown("""
 **Group Members:**  
 - MD Kabir  
 - Naman Kabra  
-- Vedant Kailas Singare  
+- Vedant Kailas Singare
+- Jeeva K.S
 
 **College:** IIT PATNA  
 **Course:** Computer Science & Data Analytics
