@@ -34,14 +34,27 @@ st.markdown("""
 
 st.subheader("Data Analytics | Percentage | CGPA | Grade | Graphs")
 
-# -------------------- SUBJECTS --------------------
-subjects = [
-    "Mathematics",
-    "Physics",
-    "Chemistry",
-    "English",
-    "Hindi"
-]
+# -------------------- INPUT: NUMBER OF SUBJECTS --------------------
+num_subjects = st.number_input(
+    "Enter Number of Subjects",
+    min_value=1,
+    step=1
+)
+
+subjects = []
+
+if num_subjects > 0:
+    st.subheader("📚 Enter Subject Names")
+
+    for i in range(num_subjects):
+        subject_name = st.text_input(
+            f"Subject {i+1} Name",
+            key=f"subject_{i}"
+        )
+        if subject_name:
+            subjects.append(subject_name)
+
+    
 
 # -------------------- INPUT: NUMBER OF STUDENTS --------------------
 num_students = st.number_input(
@@ -53,7 +66,7 @@ num_students = st.number_input(
 students_data = []
 
 # -------------------- INPUT FORM --------------------
-if num_students > 0:
+if num_students > 0 and len(subjects) == num_subjects:
     st.subheader("📝 Enter Student Details")
 
     for i in range(num_students):
