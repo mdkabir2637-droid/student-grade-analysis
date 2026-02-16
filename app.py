@@ -15,7 +15,6 @@ import matplotlib.pyplot as plt
 st.set_page_config(page_title="Student Grade Analysis", layout="wide")
 
 st.title("🎓 Capstone Project – Comparative Students Performance Analysis: A Multi-Metric Review")
-# ---------------- PROJECT INFORMATION ----------------
 
 st.markdown("""
 ### 🎓 Capstone Project Details
@@ -24,23 +23,30 @@ st.markdown("""
 **Group Members:**  
 - MD Kabir  
 - Naman Kabra  
-- Vedant Kailas Singare
-- Jeeva K.S
+- Vedant Kailas Singare  
+- Jeeva K.S  
 
 **College:** IIT PATNA  
 **Course:** Computer Science & Data Analytics
 """)
 
-
 st.subheader("Data Analytics | Percentage | CGPA | Grade | Graphs")
 
-# -------------------- INPUT: NUMBER OF SUBJECTS --------------------
+# -------------------- STEP 1: NUMBER OF STUDENTS --------------------
+num_students = st.number_input(
+    "Enter Number of Students",
+    min_value=1,
+    step=1
+)
+
+# -------------------- STEP 2: NUMBER OF SUBJECTS --------------------
 num_subjects = st.number_input(
     "Enter Number of Subjects",
     min_value=1,
     step=1
 )
 
+# -------------------- STEP 3: SUBJECT NAMES --------------------
 subjects = []
 
 if num_subjects > 0:
@@ -54,26 +60,22 @@ if num_subjects > 0:
         if subject_name:
             subjects.append(subject_name)
 
-    
-
-# -------------------- INPUT: NUMBER OF STUDENTS --------------------
-num_students = st.number_input(
-    "Enter Number of Students",
-    min_value=1,
-    step=1
-)
+if num_subjects > 0 and len(subjects) != num_subjects:
+    st.warning("Please enter all subject names first.")
 
 students_data = []
 
-# -------------------- INPUT FORM --------------------
+# -------------------- STEP 4: STUDENT INPUT --------------------
 if num_students > 0 and len(subjects) == num_subjects:
+
     st.subheader("📝 Enter Student Details")
 
     for i in range(num_students):
+
         st.markdown(f"### Student {i+1}")
 
-        roll = st.text_input(f"Roll Number", key=f"roll_{i}")
-        name = st.text_input(f"Student Name", key=f"name_{i}")
+        roll = st.text_input("Roll Number", key=f"roll_{i}")
+        name = st.text_input("Student Name", key=f"name_{i}")
 
         marks = {}
         total_marks = 0
@@ -118,7 +120,7 @@ if num_students > 0 and len(subjects) == num_subjects:
                 **marks
             })
 
-# -------------------- GENERATE RESULT --------------------
+# -------------------- STEP 5: GENERATE RESULT --------------------
 if st.button("📊 Generate Result"):
 
     if len(students_data) == 0:
@@ -129,16 +131,14 @@ if st.button("📊 Generate Result"):
         st.subheader("📋 Result Table")
         st.dataframe(df)
 
-# ---------------- DOWNLOAD AS CSV ----------------
+        # Download CSV
         csv = df.to_csv(index=False).encode('utf-8')
-
         st.download_button(
             label="⬇ Download Results as CSV",
             data=csv,
             file_name="student_results.csv",
             mime="text/csv",
-       )
-
+        )
 
         # ---------------- TOPPER & LOWEST ----------------
         topper = df.loc[df["Percentage"].idxmax()]
@@ -150,34 +150,31 @@ if st.button("📊 Generate Result"):
         with col2:
             st.error(f"⬇ Lowest Performer: {lowest['Name']} ({lowest['Percentage']}%)")
 
-        # ---------------- BAR GRAPH: STUDENT PERFORMANCE ----------------
+        # ---------------- STUDENT PERFORMANCE GRAPH ----------------
         st.subheader("📊 Student Performance (Percentage)")
 
         fig1, ax1 = plt.subplots(figsize=(10, 6))
 
-        # Find topper percentage
         top_percentage = df["Percentage"].max()
 
-        # Assign colors
         bar_colors = []
         for _, row in df.iterrows():
             if row["Percentage"] == top_percentage:
-               bar_colors.append("green")   # Topper
+                bar_colors.append("green")
             elif row["Grade"] == "F":
-                 bar_colors.append("red")     # Fail
+                bar_colors.append("red")
             else:
-                 bar_colors.append("steelblue")  # Others
+                bar_colors.append("steelblue")
 
         ax1.bar(df["Name"], df["Percentage"], color=bar_colors)
-
         ax1.set_ylabel("Percentage")
         ax1.set_xlabel("Students")
         ax1.set_title("Student vs Percentage Analysis")
 
+        plt.xticks(rotation=45)
         plt.tight_layout()
         st.pyplot(fig1, use_container_width=True)
 
-        # ---- Download Student Performance Graph ----
         buffer1 = BytesIO()
         fig1.savefig(buffer1, format="png")
         buffer1.seek(0)
@@ -187,12 +184,11 @@ if st.button("📊 Generate Result"):
             data=buffer1,
             file_name="student_performance.png",
             mime="image/png"
-       )
+        )
 
-        
-
-        # ---------------- PIE CHART: GRADE DISTRIBUTION ----------------
+        # ---------------- GRADE DISTRIBUTION ----------------
         st.subheader("🥧 Grade Distribution")
+
         grade_counts = df["Grade"].value_counts()
 
         fig2, ax2 = plt.subplots()
@@ -204,7 +200,7 @@ if st.button("📊 Generate Result"):
         )
         ax2.axis("equal")
         st.pyplot(fig2)
-        # ---- Download Grade Distribution Pie Chart ----
+
         buffer2 = BytesIO()
         fig2.savefig(buffer2, format="png")
         buffer2.seek(0)
@@ -216,27 +212,21 @@ if st.button("📊 Generate Result"):
             mime="image/png"
         )
 
-       
-
-        # ---------------- SUBJECT AVERAGE BAR GRAPH ----------------
+        # ---------------- SUBJECT AVERAGE ----------------
         st.subheader("📘 Subject-wise Average Marks")
 
         subject_avg = df[subjects].mean()
 
-        colors = ["orange", "seagreen", "purple", "teal", "brown"]
-
         fig3, ax3 = plt.subplots()
-
-        ax3.bar(subject_avg.index, subject_avg.values, color=colors)
-
+        ax3.bar(subject_avg.index, subject_avg.values)
         ax3.set_ylabel("Average Marks")
         ax3.set_xlabel("Subjects")
         ax3.set_title("Average Marks per Subject")
 
+        plt.xticks(rotation=45)
         plt.tight_layout()
         st.pyplot(fig3)
 
-        # ---- Download Subject Average Graph ----
         buffer3 = BytesIO()
         fig3.savefig(buffer3, format="png")
         buffer3.seek(0)
@@ -248,10 +238,9 @@ if st.button("📊 Generate Result"):
             mime="image/png"
         )
 
-
-
         # ---------------- SUBJECT DIFFICULTY ----------------
         st.subheader("📉 Subject Difficulty Analysis")
+
         hardest = subject_avg.idxmin()
         easiest = subject_avg.idxmax()
 
